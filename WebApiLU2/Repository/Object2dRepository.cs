@@ -15,7 +15,7 @@ namespace WebApiLU2.Repository
         {
             this.sqlConnectionString = sqlConnectionString;
         }
-
+// ik ben heel cool
  
         public async Task<Object2dModel> InsertAsync(Object2dModel object2dModel)
         {
