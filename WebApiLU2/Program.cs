@@ -15,7 +15,7 @@ if (string.IsNullOrWhiteSpace(sqlConnectionString))
 builder.Services.AddTransient<IObject2dRepository, Object2dRepository>(o => new Object2dRepository(sqlConnectionString));
 
 
-
+// regel commetaar
 
 var app = builder.Build();
 
