@@ -1,1 +1,1 @@
-I am sorry for anyone reading throug my code
+I am sorry for anyone reading my code
