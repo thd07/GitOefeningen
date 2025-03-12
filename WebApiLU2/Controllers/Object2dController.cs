@@ -27,7 +27,7 @@ public class ObjectController : ControllerBase
         return Ok(objects);
     }
 
-    [HttpPost]
+    [HttpPost("{environmentId}")]
     public async Task<IActionResult> CreateObject([FromBody] Object2D model)
     {
         using var connection = _dbContext.CreateConnection();
