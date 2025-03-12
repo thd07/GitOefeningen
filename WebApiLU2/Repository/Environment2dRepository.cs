@@ -20,8 +20,8 @@ namespace WebApiLU2.Repository
 
                 // Voer de query uit en haal de resultaten op
                 var OwnerWorlds = await sqlConnection.QueryAsync<Environment2D>(
-                    "SELECT * FROM Environment2d WHERE OwnerId = @OwnerId",
-                    new { OwnerId = userId });
+                    "SELECT * FROM Environment2d WHERE UserId = @UserId",
+                    new { UserId = userId });
 
                 // Zet de resultaten om naar een lijst en retourneer
                 return OwnerWorlds.AsList();
