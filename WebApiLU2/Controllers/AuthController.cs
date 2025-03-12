@@ -28,11 +28,11 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] User user)
     {
-        var (success, token, message) = await _authService.LoginAsync(user.Username, user.Password);
+        var (success, message) = await _authService.LoginAsync(user.Username, user.Password);
 
         if (!success)
             return Unauthorized(new { error = message });
 
-        return Ok(new { accessToken = token });
+        return Ok(new { success = "Login succesvol!" });
     }
 }
