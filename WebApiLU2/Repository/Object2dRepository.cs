@@ -17,7 +17,7 @@ namespace WebApiLU2.Repository
         }
 // ik ben heel cool
  
-        public async Task<Object2dModel> InsertAsync(Object2dModel object2dModel)
+        public async Task<Object2D> InsertAsync(Object2D object2dModel)
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
@@ -26,23 +26,23 @@ namespace WebApiLU2.Repository
             }
         }
 
-        public async Task<Object2dModel> ReadAsyncId(Guid id)
+        public async Task<Object2D> ReadAsyncId(Guid id)
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
-                return await sqlConnection.QuerySingleOrDefaultAsync<Object2dModel>("SELECT * FROM [Object2D] WHERE IdEnvironment = @IdEnvironment", new { id });
+                return await sqlConnection.QuerySingleOrDefaultAsync<Object2D>("SELECT * FROM [Object2D] WHERE IdEnvironment = @IdEnvironment", new { id });
             }
         }
 
-        public async Task<IEnumerable<Object2dModel>> ReadAsync()
+        public async Task<IEnumerable<Object2D>> ReadAsync()
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
-                return await sqlConnection.QueryAsync<Object2dModel>("SELECT * FROM [Object2D]");
+                return await sqlConnection.QueryAsync<Object2D>("SELECT * FROM [Object2D]");
             }
         }
 
-        public async Task UpdateAsync(Object2dModel object2d)
+        public async Task UpdateAsync(Object2D object2d)
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {

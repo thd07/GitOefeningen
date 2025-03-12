@@ -1,49 +1,52 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using WebApiLU2.Data;
 using WebApiLU2.Models;
-using WebApiLU2.Repository;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace WebApiLU2.Controllers
+[Route("api/objects")]
+[ApiController]
+[Authorize]
+public class ObjectController : ControllerBase
 {
-    [ApiController]
-    [Route("Object2d")]
-    public class Object2dController : ControllerBase
+    private readonly DapperDbContext _dbContext;
+
+    public ObjectController(DapperDbContext dbContext)
     {
+        _dbContext = dbContext;
+    }
 
-        private readonly IObject2dRepository _repository;
+    [HttpGet("{environmentId}")]
+    public async Task<IActionResult> GetObjects(Guid environmentId)
+    {
+        using var connection = _dbContext.CreateConnection();
 
-        public Object2dController(IObject2dRepository repository)
+        var objects = await connection.QueryAsync<Object2D>(
+            "SELECT * FROM Object2D WHERE IdEnvironment = @EnvironmentId", new { EnvironmentId = environmentId });
+
+        return Ok(objects);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateObject([FromBody] Object2D model)
+    {
+        using var connection = _dbContext.CreateConnection();
+
+        var newObject = new Object2D
         {
-            _repository = repository;
-        }
+            IdObject = Guid.NewGuid(),
+            IdEnvironment = model.IdEnvironment,
+            PrefabId = model.PrefabId,
+            PosX = model.PosX,
+            PosY = model.PosY,
+            ScaleX = model.ScaleX,
+            RotationZ = model.RotationZ,
+            SortingLayer = model.SortingLayer
+        };
 
+        await connection.ExecuteAsync(
+            "INSERT INTO Object2D (IdObject, IdEnvironment, PrefabId, PosX, PosY, ScaleX, RotationZ, SortingLayer) VALUES (@IdObject, @IdEnvironment, @PrefabId, @PosX, @PosY, @ScaleX, @RotationZ, @SortingLayer)", newObject);
 
-        //[HttpGet] ik wil dat deze alle objecten op haalt
-        [HttpGet(Name ="GetAllObjects")]
-
-        //public async Task<ActionResult> GetAll(Guid id)
-        //{
-        //    await _repository.ReadAsync(id);
-        //    return Ok(id);
-        //}
-       
-
-        //[HttpDelete] idk what to do with this one rn
-        [HttpDelete(Name ="DeleteObjectOnId")]
-        
-
-        //[HttpPost]
-        [HttpPost(Name = "AddObject")]
-        public async Task<ActionResult> Add(Object2dModel Object2d)
-        {
-
-            await _repository.InsertAsync(Object2d);
-            return Created();
-        }
-        //[HttpPut]
-        
-        
-
+        return Ok(new { success = "Object succesvol toegevoegd!", id = newObject.IdObject });
     }
 }
