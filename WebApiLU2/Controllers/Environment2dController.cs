@@ -4,67 +4,69 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
-using WebApiLU2.Data;
-using WebApiLU2.Models;
-using WebApiLU2.DTOs;
-using System.Security.Claims;
 
-[Route("api/environment")]
+using WebApiLU2.Models;
+using System.Security.Claims;
+using WebApiLU2.Services;
+using Microsoft.Data.SqlClient;
+using WebApiLU2.Repository;
+using Microsoft.AspNetCore.Http.HttpResults;
+
+[Route("/environment")]
 [ApiController]
 [Authorize]
 public class EnvironmentController : ControllerBase
 {
-    private readonly DapperDbContext _dbContext;
 
-    public EnvironmentController(DapperDbContext dbContext)
+    private readonly IAuthenticationServices _IAuthenticationServices;
+    private readonly IEnvironment2dRepository _environment2dRepository;
+
+    public EnvironmentController(IAuthenticationServices iAuthenticationServices, IEnvironment2dRepository environment2DRepository)
     {
-        _dbContext = dbContext;
+
+        _IAuthenticationServices = iAuthenticationServices;
+        _environment2dRepository = environment2DRepository;
     }
+  
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllEnvironments()
+    [HttpGet("{UserId}", Name = "GetLevels")]
+    public async Task<ActionResult<Environment2D>> Get()
     {
-        using var connection = _dbContext.CreateConnection();
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        var environments = await connection.QueryAsync<Environment2D>(
-            "SELECT * FROM 2dEnvironment WHERE UserId = @UserId", new { UserId = userId });
-
-        return Ok(environments);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> CreateEnvironment([FromBody] Environment2D model)
-    {
-        using var connection = _dbContext.CreateConnection();
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        var newEnvironment = new Environment2D
+        var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
+        if(UserId == null)
         {
-            Id = Guid.NewGuid(),
-            Name = model.Name,
-            MaxHeight = model.MaxHeight,
-            MaxLength = model.MaxLength,
-            UserId = userId
-        };
+            return BadRequest("UserId is null");
+        }
+        var environment = await _environment2dRepository.ReadWorldsAsync(Guid.Parse(UserId));
 
-        await connection.ExecuteAsync(
-            "INSERT INTO 2dEnvironment (Id, Name, MaxHeight, MaxLength, UserId) VALUES (@Id, @Name, @MaxHeight, @MaxLength, @UserId)", newEnvironment);
-
-        return Ok(new { success = "2D-wereld succesvol aangemaakt!", id = newEnvironment.Id });
+        return Ok(environment);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteEnvironment(Guid id)
+    [HttpPost("{UserId}",Name = "MakeLevel")]
+    public async Task<IActionResult> CreateEnvironment(Environment2D model)
     {
-        using var connection = _dbContext.CreateConnection();
+        var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
+        if (UserId == null)
+        {
+            return BadRequest("UserId is null");
+        }
+        var NewWorld = await _environment2dRepository.CreateWorldAsync(model,Guid.Parse(UserId));
+        return Ok(NewWorld);
+    }
 
-        int rowsAffected = await connection.ExecuteAsync(
-            "DELETE FROM 2dEnvironment WHERE Id = @Id", new { Id = id });
 
-        if (rowsAffected == 0)
-            return NotFound(new { error = "2D-wereld niet gevonden." });
+    [HttpDelete("{WorldId}", Name ="DeleteLevel")]
+    public async Task<IActionResult> DeleteEnvironment(Guid WorldId)
+    {
+        var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
+        if (UserId == null)
+        {
+            return BadRequest("UserId is null");
+        }
+        await _environment2dRepository.DeleteEnvironmentAsync(Guid.Parse(UserId),WorldId);
+        return Ok();
 
-        return Ok(new { success = "2D-wereld succesvol verwijderd!" });
     }
 }
+
+

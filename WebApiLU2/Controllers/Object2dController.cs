@@ -1,52 +1,40 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApiLU2.Data;
-using WebApiLU2.Models;
 
-[Route("api/objects")]
+using WebApiLU2.Models;
+using WebApiLU2.Repository;
+using WebApiLU2.Services;
+
+[Route("/objects")]
 [ApiController]
 [Authorize]
 public class ObjectController : ControllerBase
-{
-    private readonly DapperDbContext _dbContext;
 
-    public ObjectController(DapperDbContext dbContext)
+{
+    private readonly IObject2dRepository _IObject2DRepository;
+    private readonly IAuthenticationServices _IAuthenticationServices;
+    public ObjectController(IAuthenticationServices iAuthenticationServices, IObject2dRepository Object2dRepository)
     {
-        _dbContext = dbContext;
+        _IObject2DRepository = Object2dRepository;  
+        _IAuthenticationServices = iAuthenticationServices;
     }
 
-    [HttpGet("{environmentId}")]
-    public async Task<IActionResult> GetObjects(Guid environmentId)
+    [HttpGet("{WorldId}",Name ="getAllObjects")]
+
+    public async Task<ActionResult<Object2D>> GetAllObjects(Guid Id)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var objects = await connection.QueryAsync<Object2D>(
-            "SELECT * FROM Object2D WHERE IdEnvironment = @EnvironmentId", new { EnvironmentId = environmentId });
-
+        var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
+        var objects = await _IObject2DRepository.ReadAsyncId(Id,Guid.Parse(UserId));
         return Ok(objects);
     }
+    [HttpPost(Name = "CreateObject")]
 
-    [HttpPost("{environmentId}")]
-    public async Task<IActionResult> CreateObject([FromBody] Object2D model)
+    public async Task<IActionResult> Create2dObject(Object2D model)
     {
-        using var connection = _dbContext.CreateConnection();
-
-        var newObject = new Object2D
-        {
-            IdObject = Guid.NewGuid(),
-            IdEnvironment = model.IdEnvironment,
-            PrefabId = model.PrefabId,
-            PosX = model.PosX,
-            PosY = model.PosY,
-            ScaleX = model.ScaleX,
-            RotationZ = model.RotationZ,
-            SortingLayer = model.SortingLayer
-        };
-
-        await connection.ExecuteAsync(
-            "INSERT INTO Object2D (IdObject, IdEnvironment, PrefabId, PosX, PosY, ScaleX, RotationZ, SortingLayer) VALUES (@IdObject, @IdEnvironment, @PrefabId, @PosX, @PosY, @ScaleX, @RotationZ, @SortingLayer)", newObject);
-
-        return Ok(new { success = "Object succesvol toegevoegd!", id = newObject.IdObject });
+        var userId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
+        var objects = await _IObject2DRepository.InsertAsync(model, Guid.Parse(userId));
+        return Ok();
     }
 }

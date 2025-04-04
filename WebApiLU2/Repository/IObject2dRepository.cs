@@ -4,10 +4,9 @@ namespace WebApiLU2.Repository
 {
     public interface IObject2dRepository
     {
-        Task<Object2D> InsertAsync(Object2D objectModel);
-        Task<Object2D> ReadAsyncId(Guid id);
-        Task<IEnumerable<Object2D>> ReadAsync();
+        Task<Object2D> InsertAsync(Object2D object2dModel, Guid UserId);
+        Task<Object2D> ReadAsyncId(Guid WorldId, Guid UserId);
         Task UpdateAsync(Object2D objectModel);
-        Task DeleteAsync(Guid id);
+        Task DeleteAllAsync(Guid WorldId, Guid UserId);
     }
 }

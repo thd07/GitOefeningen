@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 /// Based on the example code provided by Microsoft
 /// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/http-context?view=aspnetcore-9.0&preserve-view=true
 /// </summary>
-public class AspNetIdentityAuthenticationService : IAuthenticationService
+public class AspNetIdentityAuthenticationService : IAuthenticationServices
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 

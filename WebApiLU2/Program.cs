@@ -1,4 +1,5 @@
 using System.Data.Common;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Identity;
 using WebApiLU2.Repository;
 using WebApiLU2.Services;
@@ -10,11 +11,11 @@ builder.Configuration
     .AddUserSecrets<Program>(optional: true) // ?? Laad User Secrets
     .AddEnvironmentVariables(); // ?? Laad omgevingsvariabelen
 
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 
 
 
-// Add services to the container.
+
+//Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -31,8 +32,11 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 {
-    options.User.RequireUniqueEmail = true;
+   
     options.Password.RequiredLength = 10;
+    //options.Password.RequireUppercase = true;
+    //options.Password.RequireDigit = true;
+    //options.Password.RequireNonAlphanumeric=true;
 })
 .AddRoles<IdentityRole>()
 .AddDapperStores(options =>
@@ -43,14 +47,25 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IAuthenticationService, AspNetIdentityAuthenticationService>();
+builder.Services.AddTransient<IAuthenticationServices, AspNetIdentityAuthenticationService>();
 
 builder.Services.AddTransient<IObject2dRepository, Object2dRepository>(o => new Object2dRepository(sqlConnectionString));
+builder.Services.AddTransient<IEnvironment2dRepository, Environment2dRepository>(o => new Environment2dRepository(sqlConnectionString));
+
+
+builder.Services
+    .AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme)
+    .Configure(options =>
+    {
+        options.BearerTokenExpiration = TimeSpan.FromMinutes(value: 120);
+    });
 
 
 // regel commetaar
 
 var app = builder.Build();
+
+
 app.MapGet("/", () => $"The API is up Connection string found: {(sqlConnectionStringFound ? "yes" : "no")}");
 
 app.UseAuthorization();
@@ -59,13 +74,14 @@ app.MapControllers().RequireAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+
 
 app.MapControllers();
 
