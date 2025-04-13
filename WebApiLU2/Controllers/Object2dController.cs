@@ -7,6 +7,8 @@ using WebApiLU2.Models;
 using WebApiLU2.Repository;
 using WebApiLU2.Services;
 
+namespace WebApiLU2.Controllers;
+
 [Route("/objects")]
 [ApiController]
 [Authorize]
@@ -17,16 +19,15 @@ public class ObjectController : ControllerBase
     private readonly IAuthenticationServices _IAuthenticationServices;
     public ObjectController(IAuthenticationServices iAuthenticationServices, IObject2dRepository Object2dRepository)
     {
-        _IObject2DRepository = Object2dRepository;  
+        _IObject2DRepository = Object2dRepository;
         _IAuthenticationServices = iAuthenticationServices;
     }
 
-    [HttpGet("{WorldId}",Name ="getAllObjects")]
-
-    public async Task<ActionResult<Object2D>> GetAllObjects(Guid Id)
+    [HttpGet("{WorldId}", Name = "getAllObjects")]
+        public async Task<ActionResult<IEnumerable<Object2D>>> GetAllObjects(Guid WorldId)
     {
         var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
-        var objects = await _IObject2DRepository.ReadAsyncId(Id,Guid.Parse(UserId));
+        var objects = await _IObject2DRepository.ReadAsyncId(WorldId, Guid.Parse(UserId));
         return Ok(objects);
     }
     [HttpPost(Name = "CreateObject")]
@@ -35,6 +36,20 @@ public class ObjectController : ControllerBase
     {
         var userId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
         var objects = await _IObject2DRepository.InsertAsync(model, Guid.Parse(userId));
+        return Ok();
+    }
+    [HttpPut(Name ="UpdateObjects")]
+    public async Task<IActionResult> UpdateAsync(Object2D objectModel)
+    {
+        var userId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
+        await _IObject2DRepository.UpdateAsync(objectModel, Guid.Parse(userId));
+        return Ok();
+    }
+    [HttpDelete(Name ="DeleteAllObjects")]
+    public async Task<IActionResult> DeleteAllAsync(Guid WorldId, Guid UserId)
+    {
+        var userId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
+        await _IObject2DRepository.DeleteAllAsync(WorldId, Guid.Parse(userId));
         return Ok();
     }
 }

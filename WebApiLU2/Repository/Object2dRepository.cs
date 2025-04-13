@@ -28,32 +28,48 @@ namespace WebApiLU2.Repository
             }
         }
 
-        public async Task<Object2D> ReadAsyncId(Guid WorldId, Guid UserId)
+        public async Task<IEnumerable<Object2D>> ReadAsyncId(Guid WorldId, Guid UserId)
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
-               var AllObjects = await sqlConnection.QuerySingleOrDefaultAsync<Object2D>("SELECT * FROM [Object2D] WHERE UserId = @UserId AND IdEnvironment = @IdEnvironment", new { UserId, IdEnvironment = WorldId });
+                var allObjects = await sqlConnection.QueryAsync<Object2D>(
+                    "SELECT * FROM [Object2D] WHERE UserId = @UserId AND IdEnvironment = @IdEnvironment",
+                    new { UserId, IdEnvironment = WorldId });
 
-                return AllObjects;
+                return allObjects;
             }
         }
 
 
-        public async Task UpdateAsync(Object2D object2d)
+        public async Task UpdateAsync(Object2D object2d, Guid UserId)
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
-                await sqlConnection.ExecuteAsync("UPDATE [Object2D] SET " +
-                                                 "IdEnvironment = @IdEnvironment" +
-                                                 "PrefabId = @PrefabId"+
-                                                 "PosX = @PosX"+
-                                                 "PosY = @PosY" +
-                                                 "ScaleX = @ScaleX" +
-                                                 "ScaleY = @ScaleY" +
-                                                 "RotationZ = @RotationZ" +
-                                                 "SortingLayer = @SortingLayer" +
-                                                 "IdObject = @IdObject"
-                                                 , object2d);
+                await sqlConnection.ExecuteAsync(
+                    "UPDATE [Object2D] SET " +
+                    "PrefabId = @PrefabId, " +
+                    "PosX = @PosX, " +
+                    "PosY = @PosY, " +
+                    "ScaleX = @ScaleX, " +
+                    "ScaleY = @ScaleY, " +
+                    "RotationZ = @RotationZ, " +
+                    "SortingLayer = @SortingLayer, " +
+                    "IdObject = @IdObject " +
+                    "WHERE UserId = @UserId AND IdEnvironment = @IdEnvironment AND IdObject = @IdObject",
+                    new
+                    {
+                        object2d.PrefabId,
+                        object2d.PosX,
+                        object2d.PosY,
+                        object2d.ScaleX,
+                        object2d.ScaleY,
+                        object2d.RotationZ,
+                        object2d.SortingLayer,
+                        object2d.IdObject,
+                        UserId,
+                        object2d.IdEnvironment
+                    });
+
                 //IdEnvironment, PrefabId, PosX, PosY, ScaleX, ScaleY, RotationZ, SortingLayer, IdObject
             }
         } 
@@ -62,7 +78,7 @@ namespace WebApiLU2.Repository
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
-                await sqlConnection.ExecuteAsync("DELETE * FROM [Object2D] WHERE UserId = @UserId AND IdEnvironment = @IdEnvironment", new { UserId = userId, IdEnvironment = WorldId });
+                await sqlConnection.ExecuteAsync("DELETE FROM [Object2D] WHERE UserId = @UserId AND IdEnvironment = @IdEnvironment", new { UserId = userId, IdEnvironment = WorldId });
             }
         }
 

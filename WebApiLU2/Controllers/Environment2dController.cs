@@ -12,6 +12,8 @@ using Microsoft.Data.SqlClient;
 using WebApiLU2.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
 
+namespace WebApiLU2.Controllers;
+
 [Route("/environment")]
 [ApiController]
 [Authorize]
@@ -29,7 +31,7 @@ public class EnvironmentController : ControllerBase
     }
   
 
-    [HttpGet("{UserId}", Name = "GetLevels")]
+    [HttpGet(Name = "GetLevels")]
     public async Task<ActionResult<Environment2D>> Get()
     {
         var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
