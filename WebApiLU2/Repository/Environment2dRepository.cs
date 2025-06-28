@@ -43,7 +43,7 @@ namespace WebApiLU2.Repository
         }
 
 
-        public async Task<Environment2D> CreateWorldAsync([FromBody] Environment2D model, Guid UserId)
+        public async Task<Environment2D> CreateWorldAsync(Environment2D model, Guid UserId)
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
@@ -56,7 +56,7 @@ namespace WebApiLU2.Repository
                     MaxLength = model.MaxLength
                 };
                 await sqlConnection.ExecuteAsync(
-                    "INSERT INTO [2dEnvironment] (Id, UserId, Name, MaxHeight, MaxLength) VALUES (@Id, @UserId, @Name, @MaxHeight, @MaxLength)", newWorld);
+                    "INSERT INTO [2dEnvironment] (Id, Name, MaxHeight, MaxLength, UserId) VALUES (@Id, @Name, @MaxHeight, @MaxLength, @UserId)", newWorld);
                 return newWorld;
             }
         }

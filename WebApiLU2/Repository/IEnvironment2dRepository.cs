@@ -7,6 +7,6 @@ namespace WebApiLU2.Repository
     {
         Task<List<Environment2D>> ReadWorldsAsync(Guid userId);
         Task DeleteEnvironmentAsync(Guid UserId, Guid WorldId);
-        Task<Environment2D> CreateWorldAsync([FromBody] Environment2D model ,Guid userId);
+        Task<Environment2D> CreateWorldAsync(Environment2D model ,Guid userId);
     }
 }

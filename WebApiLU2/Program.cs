@@ -7,9 +7,9 @@ using WebApiLU2.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true) // ?? Laad de standaard JSON-configuratie
-    .AddUserSecrets<Program>(optional: true) // ?? Laad User Secrets
-    .AddEnvironmentVariables(); // ?? Laad omgevingsvariabelen
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddUserSecrets<Program>(optional: true) 
+    .AddEnvironmentVariables(); 
 
 
 
@@ -27,7 +27,7 @@ if (string.IsNullOrWhiteSpace(sqlConnectionString))
 
 var sqlConnectionStringg = builder.Configuration.GetValue<string>("SqlConnectionString");
 var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(sqlConnectionString);
-
+var sqlConnectionString2 = builder.Configuration.GetConnectionString("SqlConnectionString2");
 builder.Services.AddAuthorization();
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>

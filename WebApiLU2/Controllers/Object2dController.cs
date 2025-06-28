@@ -25,31 +25,38 @@ public class ObjectController : ControllerBase
 
     [HttpGet("{WorldId}", Name = "getAllObjects")]
         public async Task<ActionResult<IEnumerable<Object2D>>> GetAllObjects(Guid WorldId)
-    {
-        var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
-        var objects = await _IObject2DRepository.ReadAsyncId(WorldId, Guid.Parse(UserId));
+        {
+         var objects = await _IObject2DRepository.ReadAsyncId(WorldId);
         return Ok(objects);
-    }
+        }
+
     [HttpPost(Name = "CreateObject")]
 
-    public async Task<IActionResult> Create2dObject(Object2D model)
-    {
-        var userId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
-        var objects = await _IObject2DRepository.InsertAsync(model, Guid.Parse(userId));
-        return Ok();
-    }
+        public async Task<IActionResult> Create2dObject(Object2D model)
+            {
+                var objects = await _IObject2DRepository.InsertAsync(model);
+                return Ok();
+            }
+
     [HttpPut(Name ="UpdateObjects")]
-    public async Task<IActionResult> UpdateAsync(Object2D objectModel)
+        public async Task<IActionResult> UpdateAsync(Object2D objectModel)
+        {
+            await _IObject2DRepository.UpdateAsync(objectModel);
+            return Ok();
+        }
+
+    [HttpDelete(Name ="DeleteAllObjects")]
+    public async Task<IActionResult> DeleteAllAsync(Guid WorldId)
     {
-        var userId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
-        await _IObject2DRepository.UpdateAsync(objectModel, Guid.Parse(userId));
+        await _IObject2DRepository.DeleteAllAsync(WorldId);
         return Ok();
     }
-    [HttpDelete(Name ="DeleteAllObjects")]
-    public async Task<IActionResult> DeleteAllAsync(Guid WorldId, Guid UserId)
+    [HttpDelete("{WorldId}/{IdObject}", Name = "DeleteObject")]
+    public async Task<IActionResult> DeleteOneObjectAsync(Guid WorldId, Guid ObjectId)
     {
-        var userId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
-        await _IObject2DRepository.DeleteAllAsync(WorldId, Guid.Parse(userId));
+        
+        await _IObject2DRepository.DeleteObjectAsync(WorldId,ObjectId);
         return Ok();
     }
 }
+

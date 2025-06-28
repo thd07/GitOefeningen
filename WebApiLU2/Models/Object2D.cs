@@ -14,7 +14,6 @@ namespace WebApiLU2.Models
             public int ScaleY { get; set; } // Schaal   
             public int RotationZ { get; set; } // Rotatie in graden
             public int SortingLayer { get; set; } // Renderlaag
-            public Guid UserId { get; set; } // Buitenlandse sleutel naar de gebruiker die het object heeft gemaakt
     }
 
 

@@ -44,8 +44,8 @@ public class EnvironmentController : ControllerBase
         return Ok(environment);
     }
 
-    [HttpPost("{UserId}",Name = "MakeLevel")]
-    public async Task<IActionResult> CreateEnvironment(Environment2D model)
+    [HttpPost(Name = "MakeLevel")]
+    public async Task<IActionResult> CreateEnvironment([FromBody] Environment2D model)
     {
         var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
         if (UserId == null)
@@ -68,6 +68,22 @@ public class EnvironmentController : ControllerBase
         await _environment2dRepository.DeleteEnvironmentAsync(Guid.Parse(UserId),WorldId);
         return Ok();
 
+    }
+    [HttpGet("{WorldId}", Name ="Get by Id")]
+    public async Task<IActionResult> GetById(Guid WorldId)
+    {
+        var UserId = _IAuthenticationServices.GetCurrentAuthenticatedUserId();
+        if (UserId == null)
+        {
+            return BadRequest("UserId is null");
+        }
+        var environment = await _environment2dRepository.ReadWorldsAsync(Guid.Parse(UserId));
+        var world = environment.Find(w => w.Id == WorldId);
+        if (world == null)
+        {
+            return NotFound("World not found");
+        }
+        return Ok(world);
     }
 }
 
