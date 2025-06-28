@@ -28,7 +28,7 @@ namespace TestProject1
         {
             // Arrange
             var fakeWorldId = Guid.NewGuid();
-            var fakeObjects = new List<Object2D> { new Object2D { PrefabId = 1 } };
+            var fakeObjects = new List<Object2D> { new Object2D { PrefabId = "Prefab_1" } };
 
             _mockRepo.Setup(x => x.ReadAsyncId(fakeWorldId)).ReturnsAsync(fakeObjects);
 
@@ -45,7 +45,7 @@ namespace TestProject1
         public async Task Create2dObject_ReturnsOk()
         {
             // Arrange
-            var model = new Object2D { PrefabId = 1, PosX = 5, PosY = 10 };
+            var model = new Object2D { PrefabId = "Prefab_1", PosX = 5, PosY = 10 };
             _mockRepo.Setup(x => x.InsertAsync(model)).ReturnsAsync(model);
 
             // Act
@@ -59,7 +59,7 @@ namespace TestProject1
         public async Task UpdateAsync_ReturnsOk()
         {
             // Arrange
-            var model = new Object2D { IdObject = Guid.NewGuid(), PrefabId = 1, PosX = 5, PosY = 10 };
+            var model = new Object2D { IdObject = Guid.NewGuid(), PrefabId = "Prefab_1", PosX = 5, PosY = 10 };
             _mockRepo.Setup(x => x.UpdateAsync(model)).Returns(Task.CompletedTask);
 
             // Act
