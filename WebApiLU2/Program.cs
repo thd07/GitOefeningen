@@ -21,11 +21,11 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var sqlConnectionString = builder.Configuration["SqlConnectionString"];
+var sqlConnectionString = builder.Configuration["SqlConnectionString2"];
 if (string.IsNullOrWhiteSpace(sqlConnectionString))
     throw new InvalidProgramException("Configuration variable SqlConnectionString not found");
 
-var sqlConnectionStringg = builder.Configuration.GetValue<string>("SqlConnectionString");
+var sqlConnectionStringg = builder.Configuration.GetValue<string>("SqlConnectionString2");
 var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(sqlConnectionString);
 var sqlConnectionString2 = builder.Configuration.GetConnectionString("SqlConnectionString2");
 builder.Services.AddAuthorization();
