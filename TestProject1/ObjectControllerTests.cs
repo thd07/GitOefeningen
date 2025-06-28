@@ -2,7 +2,6 @@
 using Moq;
 using WebApiLU2.Controllers;
 using WebApiLU2.Repository;
-using WebApiLU2.Services;
 using WebApiLU2.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,28 +13,24 @@ namespace TestProject1
     [TestClass]
     public class ObjectControllerTests
     {
-        private Mock<IAuthenticationServices> _mockAuthService;
         private Mock<IObject2dRepository> _mockRepo;
         private ObjectController _controller;
 
         [TestInitialize]
         public void Setup()
         {
-            _mockAuthService = new Mock<IAuthenticationServices>();
             _mockRepo = new Mock<IObject2dRepository>();
-            _controller = new ObjectController(_mockAuthService.Object, _mockRepo.Object);
+            _controller = new ObjectController(null, _mockRepo.Object); // Auth service no longer needed
         }
 
         [TestMethod]
         public async Task GetAllObjects_ReturnsOk_WithObjectList()
         {
             // Arrange
-            var fakeUserId = Guid.NewGuid().ToString();
             var fakeWorldId = Guid.NewGuid();
             var fakeObjects = new List<Object2D> { new Object2D { PrefabId = 1 } };
 
-            _mockAuthService.Setup(x => x.GetCurrentAuthenticatedUserId()).Returns(fakeUserId);
-            _mockRepo.Setup(x => x.ReadAsyncId(fakeWorldId, Guid.Parse(fakeUserId))).ReturnsAsync(fakeObjects);
+            _mockRepo.Setup(x => x.ReadAsyncId(fakeWorldId)).ReturnsAsync(fakeObjects);
 
             // Act
             var result = await _controller.GetAllObjects(fakeWorldId);
@@ -43,48 +38,29 @@ namespace TestProject1
             // Assert
             var okResult = result.Result as OkObjectResult;
             Assert.IsNotNull(okResult);
-            Assert.IsInstanceOfType(okResult.Value, typeof(List<Object2D>));
+            Assert.IsInstanceOfType(okResult.Value, typeof(IEnumerable<Object2D>));
         }
 
         [TestMethod]
-        public async Task GetAllObjects_ReturnsBadRequest_WhenUserIdIsNull()
-        {
-            _mockAuthService.Setup(x => x.GetCurrentAuthenticatedUserId()).Returns((string)null);
-            var fakeWorldId = Guid.NewGuid();
-
-            var result = await _controller.GetAllObjects(fakeWorldId);
-
-            Assert.IsInstanceOfType(result.Result, typeof(BadRequestObjectResult));
-        }
-
-        [TestMethod]
-        public async Task Create2dObject_ReturnsOk_WithCreatedObject()
+        public async Task Create2dObject_ReturnsOk()
         {
             // Arrange
-            var fakeUserId = Guid.NewGuid().ToString();
             var model = new Object2D { PrefabId = 1, PosX = 5, PosY = 10 };
-            var createdObject = new Object2D { IdObject = Guid.NewGuid(), PrefabId = model.PrefabId };
-
-            _mockAuthService.Setup(x => x.GetCurrentAuthenticatedUserId()).Returns(fakeUserId);
-            _mockRepo.Setup(x => x.InsertAsync(model, Guid.Parse(fakeUserId))).ReturnsAsync(createdObject);
+            _mockRepo.Setup(x => x.InsertAsync(model)).ReturnsAsync(model);
 
             // Act
             var result = await _controller.Create2dObject(model);
-            var okResult = result as OkResult;
 
             // Assert
-            Assert.IsNotNull(okResult);
+            Assert.IsInstanceOfType(result, typeof(OkResult));
         }
 
         [TestMethod]
         public async Task UpdateAsync_ReturnsOk()
         {
             // Arrange
-            var fakeUserId = Guid.NewGuid().ToString();
             var model = new Object2D { IdObject = Guid.NewGuid(), PrefabId = 1, PosX = 5, PosY = 10 };
-
-            _mockAuthService.Setup(x => x.GetCurrentAuthenticatedUserId()).Returns(fakeUserId);
-            _mockRepo.Setup(x => x.UpdateAsync(model, Guid.Parse(fakeUserId))).Returns(Task.CompletedTask);
+            _mockRepo.Setup(x => x.UpdateAsync(model)).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.UpdateAsync(model);
@@ -97,18 +73,29 @@ namespace TestProject1
         public async Task DeleteAllAsync_ReturnsOk()
         {
             // Arrange
-            var fakeUserId = Guid.NewGuid().ToString();
             var worldId = Guid.NewGuid();
-
-            _mockAuthService.Setup(x => x.GetCurrentAuthenticatedUserId()).Returns(fakeUserId);
-            _mockRepo.Setup(x => x.DeleteAllAsync(worldId, Guid.Parse(fakeUserId))).Returns(Task.CompletedTask);
+            _mockRepo.Setup(x => x.DeleteAllAsync(worldId)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await _controller.DeleteAllAsync(worldId, Guid.Parse(fakeUserId));
+            var result = await _controller.DeleteAllAsync(worldId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(OkResult));
+        }
+
+        [TestMethod]
+        public async Task DeleteOneObjectAsync_ReturnsOk()
+        {
+            // Arrange
+            var worldId = Guid.NewGuid();
+            var objectId = Guid.NewGuid();
+            _mockRepo.Setup(x => x.DeleteObjectAsync(worldId, objectId)).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _controller.DeleteOneObjectAsync(worldId, objectId);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(OkResult));
         }
     }
 }
-
