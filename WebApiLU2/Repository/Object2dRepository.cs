@@ -90,13 +90,13 @@ namespace WebApiLU2.Repository
                 await sqlConnection.ExecuteAsync("DELETE FROM [Object2D] WHERE IdEnvironment = @IdEnvironment", new {IdEnvironment = WorldId });
             }
         }
-        public async Task DeleteObjectAsync(Guid WorldId, Guid ObjectId)
+        public async Task DeleteObjectAsync(Guid WorldId, Guid IdObject)
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
                 await sqlConnection.ExecuteAsync(
                     "DELETE FROM [Object2D] WHERE IdEnvironment = @IdEnvironment AND IdObject = @IdObject",
-                    new { IdEnvironment = WorldId, IdObject = ObjectId }
+                    new { IdEnvironment = WorldId, IdObject = IdObject }
                 );
             }
         }

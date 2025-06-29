@@ -53,10 +53,10 @@ public class ObjectController : ControllerBase
         return Ok();
     }
     [HttpDelete("{WorldId}/{IdObject}", Name = "DeleteObject")]
-    public async Task<IActionResult> DeleteOneObjectAsync(Guid WorldId, Guid ObjectId)
+    public async Task<IActionResult> DeleteOneObjectAsync(Guid WorldId, Guid IdObject)
     {
-        
-        await _IObject2DRepository.DeleteObjectAsync(WorldId,ObjectId);
+           
+        await _IObject2DRepository.DeleteObjectAsync(WorldId,IdObject);
         return Ok();
     }
 }
