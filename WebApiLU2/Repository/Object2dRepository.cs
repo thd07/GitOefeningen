@@ -16,18 +16,29 @@ namespace WebApiLU2.Repository
             this.sqlConnectionString = sqlConnectionString;
         }
 
- 
+
         public async Task<Object2D> InsertAsync(Object2D object2dModel)
         {
-            using (var sqlConnection = new SqlConnection(sqlConnectionString))
+            using var sqlConnection = new SqlConnection(sqlConnectionString);
+
+            // Check if the environment exists
+            var environmentExists = await sqlConnection.ExecuteScalarAsync<int>(
+                "SELECT COUNT(1) FROM [2dEnvironment] WHERE Id = @Id", new { Id = object2dModel.IdEnvironment });
+
+            if (environmentExists == 0)
             {
-               
-                object2dModel.IdObject = Guid.NewGuid();
-               
-                await sqlConnection.ExecuteAsync("INSERT INTO [Object2D] (IdEnvironment, PrefabId, PosX, PosY, ScaleX, ScaleY, RotationZ, SortingLayer, IdObject) VALUES (@IdEnvironment, @PrefabId, @PosX, @PosY, @ScaleX, @ScaleY, @RotationZ, @SortingLayer, @IdObject)", object2dModel );
-                return object2dModel;
+                throw new Exception($"Environment with Id {object2dModel.IdEnvironment} does not exist.");
             }
+
+            object2dModel.IdObject = Guid.NewGuid();
+
+            await sqlConnection.ExecuteAsync(
+                "INSERT INTO [Object2D] (IdEnvironment, PrefabId, PosX, PosY, ScaleX, ScaleY, RotationZ, SortingLayer, IdObject) VALUES (@IdEnvironment, @PrefabId, @PosX, @PosY, @ScaleX, @ScaleY, @RotationZ, @SortingLayer, @IdObject)",
+                object2dModel);
+
+            return object2dModel;
         }
+
 
         public async Task<IEnumerable<Object2D>> ReadAsyncId(Guid WorldId)
         {
