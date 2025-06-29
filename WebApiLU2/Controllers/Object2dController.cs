@@ -9,7 +9,7 @@ using WebApiLU2.Services;
 
 namespace WebApiLU2.Controllers;
 
-[Route("/objects")]
+[Route("objects")]
 [ApiController]
 [Authorize]
 public class ObjectController : ControllerBase
