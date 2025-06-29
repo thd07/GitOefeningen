@@ -3,23 +3,40 @@ using System.Text.Json.Serialization;
 
 namespace WebApiLU2.Models
 {
-    
-        public class Object2D
-        {
-           [JsonPropertyName("environmentId")]
-            public Guid IdEnvironment { get; set; } // Buitenlandse sleutel naar Environment2D
-            public string PrefabId { get; set; } // Object type ID
-            public float PosX { get; set; } // X-coördinaat
-            public float PosY { get; set; } // Y-coördinaat
-            public float ScaleX { get; set; } // Schaal
-            public float ScaleY { get; set; } // Schaal   
-            public float RotationZ { get; set; } // Rotatie in graden
-            public int SortingLayer { get; set; } // Renderlaag
-            public Guid IdObject { get; set; } // Primaire sleutel
+
+    using System.Text.Json.Serialization;
+
+    public class Object2D
+    {
+        [JsonPropertyName("idEnvironment")]
+        public Guid IdEnvironment { get; set; }
+
+        [JsonPropertyName("prefabId")]
+        public string PrefabId { get; set; }
+
+        [JsonPropertyName("posX")]
+        public float PosX { get; set; }
+
+        [JsonPropertyName("posY")]
+        public float PosY { get; set; }
+
+        [JsonPropertyName("scaleX")]
+        public float ScaleX { get; set; }
+
+        [JsonPropertyName("scaleY")]
+        public float ScaleY { get; set; }
+
+        [JsonPropertyName("rotationZ")]
+        public float RotationZ { get; set; }
+
+        [JsonPropertyName("sortingLayer")]
+        public int SortingLayer { get; set; }
+
+        public Guid IdObject { get; set; }
     }
 
 
 
 
-    
+
 }
