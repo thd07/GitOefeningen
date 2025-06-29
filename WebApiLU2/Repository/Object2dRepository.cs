@@ -58,26 +58,27 @@ namespace WebApiLU2.Repository
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
                 await sqlConnection.ExecuteAsync(
-
-                    "UPDATE [Object2D] SET " +
-                    "PrefabId = @PrefabId, " +
-                    "PosX = @PosX, " +
-                    "PosY = @PosY, " +
-                    "ScaleX = @ScaleX, " +
-                    "ScaleY = @ScaleY, " +
-                    "RotationZ = @RotationZ, " +
-                    "SortingLayer = @SortingLayer, " +
-                    "WHERE IdEnvironment = @IdEnvironment AND IdObject = @IdObject",
-                    new
-                    {
-                        object2d.PrefabId,
-                        object2d.PosX,
-                        object2d.PosY,
-                        object2d.ScaleX,
-                        object2d.ScaleY,
-                        object2d.RotationZ,
-                        object2d.SortingLayer,
-                    });
+    "UPDATE [Object2D] SET " +
+    "PrefabId = @PrefabId, " +
+    "PosX = @PosX, " +
+    "PosY = @PosY, " +
+    "ScaleX = @ScaleX, " +
+    "ScaleY = @ScaleY, " +
+    "RotationZ = @RotationZ, " +
+    "SortingLayer = @SortingLayer " +  // <-- No comma here
+    "WHERE IdEnvironment = @IdEnvironment AND IdObject = @IdObject",
+    new
+    {
+        object2d.PrefabId,
+        object2d.PosX,
+        object2d.PosY,
+        object2d.ScaleX,
+        object2d.ScaleY,
+        object2d.RotationZ,
+        object2d.SortingLayer,
+        object2d.IdEnvironment,  // You need to pass this parameter too
+        object2d.IdObject       // And this one
+    });
 
 
             }

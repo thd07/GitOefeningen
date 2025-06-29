@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace WebApiLU2.Models
 {
     
         public class Object2D
         {
-            
+           [JsonPropertyName("environmentId")]
             public Guid IdEnvironment { get; set; } // Buitenlandse sleutel naar Environment2D
             public string PrefabId { get; set; } // Object type ID
             public float PosX { get; set; } // X-coördinaat
