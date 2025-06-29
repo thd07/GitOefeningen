@@ -42,7 +42,8 @@ public class ObjectController : ControllerBase
         public async Task<IActionResult> UpdateAsync(Object2D objectModel)
         {
             await _IObject2DRepository.UpdateAsync(objectModel);
-            return Ok();
+            bool trueOrFalse = true;
+        return Ok(trueOrFalse);
         }
 
     [HttpDelete(Name ="DeleteAllObjects")]
