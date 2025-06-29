@@ -32,7 +32,7 @@ public class ObjectController : ControllerBase
 
     [HttpPost(Name = "CreateObject")]
 
-        public async Task<IActionResult> Create2dObject(Object2D model)
+        public async Task<IActionResult> Create2dObject([FromBody] Object2D model)
             {
                 var objects = await _IObject2DRepository.InsertAsync(model);
                 return Ok(objects);
